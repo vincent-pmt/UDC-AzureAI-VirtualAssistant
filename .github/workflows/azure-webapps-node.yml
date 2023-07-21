@@ -35,6 +35,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./UDC-VA-ChatBot
     steps:
     - uses: actions/checkout@v3
 
