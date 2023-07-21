@@ -20,8 +20,6 @@
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - "./UDC-VA-ChatBot"
   workflow_dispatch:
 
 env:
