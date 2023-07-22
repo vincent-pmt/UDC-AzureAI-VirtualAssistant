@@ -3,6 +3,7 @@
 
 const { ActivityHandler, ActivityTypes } = require('botbuilder');
 const { CustomQuestionAnswering } = require('botbuilder-ai');
+const { LuisRecognizer } = require('botbuilder-ai')
 
 class CustomQABot extends ActivityHandler {
     constructor() {
@@ -14,8 +15,16 @@ class CustomQABot extends ActivityHandler {
                 endpointKey: process.env.LanguageEndpointKey,
                 host: process.env.LanguageEndpointHostName
             });
+
+            // create a IntentRecognizer connector
+            const recognizerOptions = {
+                apiVersion: 'v3'
+            };
+
+            //this.recognizer = new LuisRecognizer(configuration, recognizerOptions);
+
         } catch (err) {
-            console.warn(`QnAMaker Exception: ${ err } Check your QnAMaker configuration in .env`);
+            console.warn(`QnAMaker Exception: ${err} Check your QnAMaker configuration in .env`);
         }
 
         // If a new user is added to the conversation, send them a greeting message
@@ -47,6 +56,8 @@ class CustomQABot extends ActivityHandler {
                 const displayPreciseAnswerOnly = process.env.DisplayPreciseAnswerOnly === 'true';
                 const response = await this.qnaMaker.getAnswers(context, { enablePreciseAnswer: enablePreciseAnswer });
 
+                // const LuisResult = await this.recognizer.executeLuisQuery(context);
+
                 // If an answer was received from CQA, send the answer back to the user.
                 if (response.length > 0) {
                     var activities = [];
@@ -57,7 +68,15 @@ class CustomQABot extends ActivityHandler {
                     var preciseAnswerText = response[0].answerSpan?.text;
                     if (!preciseAnswerText) {
                         activities.push({ type: ActivityTypes.Message, text: answerText });
-                    } else {
+                    } 
+                    else {
+                        if (preciseAnswerText === "Appoinment") {
+                            const checkavailability1 = "Current time slots available: 8am, 9am, 10am, 11am, 12pm, 1pm, 2pm, 3pm, 4pm"
+                            await context.sendActivity(checkavailability1);
+                            await next();
+                            return;
+                        };
+
                         activities.push({ type: ActivityTypes.Message, text: preciseAnswerText });
 
                         if (!displayPreciseAnswerOnly) {
